@@ -276,10 +276,8 @@ def on_press(key):
         else:
             keylocation = keys.index(key.strip("'"))
             keys.remove(keylocation)
-        print(keys)
         if key == keyboard.Key.esc:
             boxlength = keyShortSet.get()
-            print(boxlength)
             keyShortSet.delete(len(boxlength)-1, END)
             keys.remove(str(keyboard.Key.esc)) # Causes ValueError, but that's good, because I don't have to add code to remove the Escape key from the list. Not a bug, but a feature!
             keys.clear()
@@ -952,7 +950,6 @@ root.mainloop()
 if enabled == 1:
     os.popen("killall ffmpeg")
     buttons = []
-    print(shortcut)
     for num, word in enumerate(shortcut.split("+")):
         if len(word) > 3 and word.strip("Key."):
             buttons.append("<" + word.strip("Key.\n") + ">")
