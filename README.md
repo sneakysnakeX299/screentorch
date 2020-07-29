@@ -26,3 +26,6 @@
 - Fix dodgy solutions and make code less spaghetti
 - Add shortcut to stop ffmpeg
 - Fix the final bit of the code so space could be saved
+
+# Bug reports:
+Please, report bugs, so I can fix them. Feel free to pull and rework it, I'd like to learn from better coders than me. Thank you.
