@@ -1,0 +1,11 @@
+# WARNING! Clearing the file may result in the program breaking.
+enabled = 0
+length = 60
+fps = 60
+bitrate = 15000
+nvenc = 1
+mic = 0
+quality = 2
+output = /home/sneakysnake
+temp = /tmp
+shortcut = Key.alt+c
