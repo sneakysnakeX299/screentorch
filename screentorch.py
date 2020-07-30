@@ -1037,8 +1037,18 @@ if enabled == 1:
     rescmd = os.popen("xrandr | grep \* | cut -d' ' -f4").read().strip()
     if screen == "0":
         offset = ['0']
-    else:
+    elif int(screen) == 1:
         offset = rescmd.split("\n")[0].split("x")
+    elif int(screen) > 1:
+        recscreen = 0
+        screenlist = rescmd.split("\n")
+        offset = 0
+        while recscreen != len(screenlist):
+            screenres = []
+            screenres = rescmd.split("\n")[recscreen].split("x")
+            recscreen += 1
+            offset = int(offset) + int(screenres[0])
+        offset = [str(offset)]
     res = rescmd.split("\n")
 
     def ffmpeg():
@@ -1080,19 +1090,10 @@ if enabled == 1:
     RecordingThread(target=ffmpeg, name="recording").start()
     sleep(1)
     if microphone == 1:
-        outsource = os.popen("pactl list short sources | grep .monitor | grep RUNNING").read()
-        char = []
-        for num, string in enumerate(outsource.split("\t")):
-            char.append(string)
-        sourcenum = char[0]
-        os.popen("pactl set-default-source " + sourcenum)
+        #outsource = os.popen("pacmd list-sources|awk '/index:/ {print $0}; /name:/ {print $0};/device\.description/ {print $0}'").read()
+        os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "ffmpeg"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR+1)}' + "'" + '|bash')
     else:
-        outsource = os.popen("pactl list short sources | grep -v .monitor | grep SUSPENDED").read()
-        char = []
-        for num, string in enumerate(outsource.split("\t")):
-            char.append(string)
-        sourcenum = char[0]
-        os.popen("pactl set-default-source " + sourcenum)
+        os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "ffmpeg"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR-0)}' + "'" + '|bash')
 
 
     def on_activate():
