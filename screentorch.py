@@ -44,7 +44,7 @@ class ToggleFeature(Enum):
 root = Tk()
 root.title("screentorch")
 root.resizable(False, False)
-root.geometry("520x530")
+root.geometry("520x580")
 root.configure(background="#1c1c1c")
 
 offstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/offstate.png"))
@@ -91,6 +91,7 @@ temp = ""
 fps = ""
 cliplength = ""
 shortcut = ""
+screen = ""
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
     conline = configfile.readlines()
@@ -258,8 +259,50 @@ except IndexError:
     with open(homedir + "/.config/screentorch/config", "a") as configfile:
         configfile.writelines("mic = 0\n")
 
+
+def typeCheck(event):
+    if event.char in '[0123456789]':
+        pass
+    elif event.keysym not in ('Delete', 'BackSpace'):
+        return 'break'
+
+
+screenLabel = Label(root, text="Screen(in numbers, starting from 0):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
+screenLabel.grid(row=7, column=0, padx=16, sticky=W, pady=7)
+
+screenTextbox = Entry(root, width=32, bg="#2c2c2c", fg="white")
+
+with open(homedir + "/.config/screentorch/config", "r") as configfile:
+    conline = configfile.readlines()
+
+line = 0
+while line < len(conline) and not re.match('^screen\W+=\W+[0-9][0-9]{0,9}|2147483648$', conline[line].strip()):
+    line += 1
+
+if not line < len(conline) and len(conline) > 0:
+    if not conline[-1][-1] == "\n":
+        conline[-1] = conline[-1] + "\n"
+else:
+    pass
+
+    if re.match('^screen\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
+        pass
+
+    conline[line] = "screen = " + str(conline[line]) + "\n"
+try:
+    screenTextbox.insert(0, conline[line].strip("screen =\n"))
+    screen = conline[line].strip("screen =\n")
+except IndexError:
+    screenTextbox.insert(0, "0")
+    screen = "0"
+    with open(homedir + "/.config/screentorch/config", "a") as configfile:
+        configfile.writelines("screen = 0\n")
+
+screenTextbox.grid(row=7, column=0, columnspan=2, sticky=E)
+screenTextbox.bind("<KeyPress>", typeCheck)
+
 keyShort = Label(root, text="Shortcut(Esc when done):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
-keyShort.grid(row=7, column=0, padx=16, sticky=W, pady=7)
+keyShort.grid(row=8, column=0, padx=16, sticky=W, pady=13)
 
 keys = []
 
@@ -361,10 +404,10 @@ except IndexError:
         configfile.writelines("shortcut = Key.alt+c\n")
 
 
-keyShortSet.grid(row=7, column=0, columnspan=2, sticky=E)
+keyShortSet.grid(row=8, column=0, columnspan=2, sticky=E)
 
 fileOutput = Label(root, text="Output:", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
-fileOutput.grid(row=8, column=0, padx=16, sticky=W, pady=13)
+fileOutput.grid(row=9, column=0, padx=16, sticky=W, pady=7)
 
 fileOutputTextbox = Entry(root, width=54, bg="#2c2c2c", fg="white")
 
@@ -397,14 +440,7 @@ except IndexError:
         configfile.writelines("output = " + homedir + "\n")
 
 
-fileOutputTextbox.grid(row=8, column=0, columnspan=2, sticky=E)
-
-
-def typeCheck(event):
-    if event.char in '[0123456789]':
-        pass
-    elif event.keysym not in ('Delete', 'BackSpace'):
-        return 'break'
+fileOutputTextbox.grid(row=9, column=0, columnspan=2, sticky=E)
 
 
 length = Entry(root, width=22, bg="#2c2c2c", fg="white")
@@ -504,7 +540,7 @@ setBitrate.bind('<KeyPress>', typeCheck)
 
 
 tmpOutput = Label(root, text="Temp directory:", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
-tmpOutput.grid(row=9, column=0, padx=16, sticky=W, pady=7)
+tmpOutput.grid(row=10, column=0, padx=16, sticky=W, pady=13)
 
 
 tmpOutputTextbox = Entry(root, width=48, bg="#2c2c2c", fg="white")
@@ -538,7 +574,7 @@ except IndexError:
         configfile.writelines("temp = /tmp\n")
 
 
-tmpOutputTextbox.grid(row=9, column=0, columnspan=2, sticky=E)
+tmpOutputTextbox.grid(row=10, column=0, columnspan=2, sticky=E)
 
 
 def saveClick(clicksavebutton):
@@ -548,7 +584,7 @@ def saveClick(clicksavebutton):
     outputbox = fileOutputTextbox.get()
     tempbox = tmpOutputTextbox.get()
     shortbox = keyShortSet.get()
-
+    screenbox = screenTextbox.get()
     def saveLength():
         global cliplength
         with open(homedir + "/.config/screentorch/config", "r") as configfile:
@@ -569,7 +605,7 @@ def saveClick(clicksavebutton):
                 return
 
             conline[line] = "length = " + str(lengthbox) + "\n"
-        if int(lengthbox) <= 3600 and int(fpsbox) <= 2147483648 and int(bitratebox) <= 2147483648:
+        if int(lengthbox) <= 3600 and int(fpsbox) <= 2147483648 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             cliplength = conline[line].strip("length =\n")
@@ -601,7 +637,7 @@ def saveClick(clicksavebutton):
                 return
 
             conline[line] = "fps = " + str(fpsbox) + "\n"
-        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648:
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             fps = conline[line].strip("fps =\n")
@@ -633,11 +669,43 @@ def saveClick(clicksavebutton):
                 return
 
             conline[line] = "bitrate = " + str(bitratebox) + "\n"
-        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648:
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
             bitrate = conline[line].strip("bitrate =\n")
+            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.after(1000, saveLabel.destroy)
+        else:
+            saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
+            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.after(3500, saveLabel.destroy)
+
+    def saveScreen():
+        global screen
+        with open(homedir + "/.config/screentorch/config", "r") as configfile:
+            conline = configfile.readlines()
+
+        line = 0
+        while line < len(conline) and not re.match('^screen\W+=\W+[0-9][0-9]{0,9}|2147483648$', conline[line].strip()):
+            line += 1
+
+        if not line < len(conline) and len(conline) > 0:
+            if not conline[-1][-1] == "\n":
+                conline[-1] = conline[-1] + "\n"
+            conline.append("screen = " + str(screenbox) + "\n")
+        else:
+            pass
+
+            if re.match('^screen\W+=\W+' + str(screenbox) + '$', conline[line].strip()):
+                return
+
+            conline[line] = "screen = " + str(screenbox) + "\n"
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
+            with open(homedir + "/.config/screentorch/config", "w") as configfile:
+                configfile.writelines(conline)
+            saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
+            screen = conline[line].strip("screen =\n")
             saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
@@ -665,7 +733,7 @@ def saveClick(clicksavebutton):
                 return
 
             conline[line] = "output = " + str(outputbox) + "\n"
-        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648:
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             output = conline[line].strip("output =\n")
@@ -697,7 +765,7 @@ def saveClick(clicksavebutton):
                 return
 
             conline[line] = "shortcut = " + str(shortbox) + "\n"
-        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648:
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             shortcut = keyShortSet.get()
@@ -729,7 +797,7 @@ def saveClick(clicksavebutton):
                 return
 
             conline[line] = "temp = " + str(tempbox) + "\n"
-        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648:
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             temp = conline[line].strip("temp =\n")
@@ -747,6 +815,7 @@ def saveClick(clicksavebutton):
     saveLocation()
     saveTemp()
     saveShortcut()
+    saveScreen()
     tmpsl = tmpOutputTextbox.get()
     if tmpsl == "Tomo chan best girl":
         os.popen("xdg-open " + homedir + "/.config/screentorch/assets/test.jpg")
@@ -965,13 +1034,21 @@ if enabled == 1:
         wordcount += 1
     filename = str(random.randrange(10000000000)) + ".mkv"
     filename2 = str(random.randrange(10000000000)) + ".mkv"
-    res = os.popen("xrandr | grep \* | cut -d' ' -f4").read().strip()
+    rescmd = os.popen("xrandr | grep \* | cut -d' ' -f4").read().strip()
+    if screen == "0":
+        offset = ['0']
+    else:
+        offset = rescmd.split("\n")[0].split("x")
+    res = rescmd.split("\n")
 
     def ffmpeg():
-        os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
+        if len(res) > 1 and offset[0] != str(offset):
+            os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
+        else:
+            os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
 
     def instance2():
-        os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
+        os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
 
     class RecordingThread(threading.Thread):
         daemon = True
