@@ -12,8 +12,10 @@ from datetime import datetime
 os.environ.setdefault("ESCDELAY", "0")
 
 homedir = os.path.expanduser('~')
-if not os.path.exists(homedir + "/.config/screentorch"):
-    os.mkdir(homedir + "/.config/screentorch")
+if not os.path.exists(homedir + "/.cache"):
+    os.mkdir(homedir + "/.cache")
+if not os.path.exists(homedir + "/.cache/screentorch"):
+    os.mkdir(homedir + "/.cache/screentorch")
 if not os.path.exists(homedir + "/.config/screentorch/config"):
     f = open(homedir + "/.config/screentorch/config", "w+")
     f.write("\n\n")
@@ -568,10 +570,10 @@ try:
     temp = brokentext.strip()
     tmpOutputTextbox.insert(0, brokentext.strip("\n"))
 except IndexError:
-    temp = "/tmp"
-    tmpOutputTextbox.insert(0, "/tmp")
+    temp = homedir + "/.cache/screentorch"
+    tmpOutputTextbox.insert(0, homedir + "/.cache/screentorch")
     with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("temp = /tmp\n")
+        configfile.writelines("temp = " + homedir + "/.cache/screentorch\n")
 
 
 tmpOutputTextbox.grid(row=10, column=0, columnspan=2, sticky=E)
