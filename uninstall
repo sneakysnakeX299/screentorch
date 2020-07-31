@@ -1,0 +1,2 @@
+rm -rf ~/.config/screentorch
+sudo rm /usr/bin/screentorch
