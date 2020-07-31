@@ -1011,9 +1011,6 @@ quitButton = Label(root, image=quitButtonImg)
 quitButton.place(relx=0.5, rely=0.92, anchor=CENTER)
 quitButton.bind("<Button-1>", destroyUI)
 
-warning = Label(root, text="WARNING! Starting will kill ALL INSTANCES of ffmpeg!", bg="#1c1c1c", fg="white")
-warning.place(relx=0.2, rely=0.965)
-
 
 root.mainloop()
 if enabled == 1:
