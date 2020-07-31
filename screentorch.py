@@ -1015,11 +1015,9 @@ warning = Label(root, text="WARNING! Starting will kill ALL INSTANCES of ffmpeg!
 warning.place(relx=0.2, rely=0.965)
 
 
-save['state'] = "normal"
-
 root.mainloop()
 if enabled == 1:
-    os.popen("killall ffmpeg")
+    os.popen("killall recorder")
     buttons = []
     for num, word in enumerate(shortcut.split("+")):
         if len(word) > 3 and word.strip("Key."):
@@ -1055,13 +1053,13 @@ if enabled == 1:
 
     def ffmpeg():
         if len(res) > 1 and offset[0] != str(offset):
-            os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
+            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
         else:
-            os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
-
+            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
+    '''
     def instance2():
-        os.popen("ffmpeg -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
-
+        os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
+    '''
     class RecordingThread(threading.Thread):
         daemon = True
 
@@ -1100,7 +1098,7 @@ if enabled == 1:
 
     def on_activate():
         global filename
-        os.popen("killall ffmpeg")
+        os.popen("killall recorder")
         RecordingThread(target=ffmpeg, name="recording").stop()
         sleep(2)
         filelength = os.popen("ffprobe -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -show_entries format=duration -v quiet -of csv='p=0'").read().strip()
