@@ -1,0 +1,4 @@
+rm -rf ~/.config/screentorch
+sudo rm /usr/bin/screentorch.py
+sudo rm /usr/bin/screentorch
+
