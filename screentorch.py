@@ -46,7 +46,7 @@ class ToggleFeature(Enum):
 root = Tk()
 root.title("screentorch")
 root.resizable(False, False)
-root.geometry("520x580")
+root.geometry("520x620")
 root.configure(background="#1c1c1c")
 
 offstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/offstate.png"))
@@ -94,6 +94,7 @@ fps = ""
 cliplength = ""
 shortcut = ""
 screen = ""
+pshortcut = ""
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
     conline = configfile.readlines()
@@ -272,7 +273,7 @@ def typeCheck(event):
 screenLabel = Label(root, text="Screen(in numbers, starting from 0):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
 screenLabel.grid(row=7, column=0, padx=16, sticky=W, pady=7)
 
-screenTextbox = Entry(root, width=32, bg="#2c2c2c", fg="white")
+screenTextbox = Entry(root, width=30, bg="#2c2c2c", fg="white")
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
     conline = configfile.readlines()
@@ -303,7 +304,7 @@ except IndexError:
 screenTextbox.grid(row=7, column=0, columnspan=2, sticky=E)
 screenTextbox.bind("<KeyPress>", typeCheck)
 
-keyShort = Label(root, text="Shortcut(Esc when done):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
+keyShort = Label(root, text="Highlight shortcut(Esc when done):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
 keyShort.grid(row=8, column=0, padx=16, sticky=W, pady=13)
 
 keys = []
@@ -373,10 +374,77 @@ def disableBox(event):
     return 'break'
 
 
-keyShortSet = Entry(root, width=40, bg="#2c2c2c", fg="white", textvariable=on_release)
+keyShortSet = Entry(root, width=30, bg="#2c2c2c", fg="white", textvariable=on_release)
 keyShortSet.bind('<KeyPress>', disableBox)
 keyShortSet.bind('<Button-1>', keyListen)
 
+pauseShort = Label(root, text="Pause shortcut(Esc when done):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
+pauseShort.grid(row=9, column=0, padx=16, sticky=W, pady=7)
+
+
+def on_press(key):
+    try:
+        selection = root.focus_get()
+        if str(selection) != ".!entry3":
+            pauseShortSet.delete(0, END)
+            keys.clear()
+            return False
+        if str(key).strip("'") not in keys:
+            keys.append(str(key).strip("'"))
+        else:
+            keylocation = keys.index(key.strip("'"))
+            keys.remove(keylocation)
+        if key == keyboard.Key.esc:
+            boxlength = pauseShortSet.get()
+            pauseShortSet.delete(len(boxlength)-1, END)
+            keys.remove(str(keyboard.Key.esc)) # Causes ValueError, but that's good, because I don't have to add code to remove the Escape key from the list. Not a bug, but a feature!
+            keys.clear()
+            root.focus()
+        if keys.index(str(key).strip("'")) != len(keys):
+            pauseShortSet.insert(END, str(key).strip("'") + "+")
+        else:
+            pauseShortSet.insert(END, str(key).strip("'"))
+    except AttributeError:
+        selection = root.focus_get()
+        if str(selection) != ".!entry3":
+            pauseShortSet.delete(0, END)
+            keys.clear()
+            return False
+
+
+def on_release(key):
+    if key == key:
+        keys.remove(str(key).strip("'"))
+        pauseShortSet.delete(0, END)
+        lastkey = 0
+        while lastkey < len(keys) and len(keys) > 0:
+            lastkey += 1
+            if lastkey > len(keys):
+                lastkey = 0
+            else:
+                pauseShortSet.insert(0, str(keys[lastkey-2]) + "+")
+    if key == keyboard.Key.esc:
+        keys.clear()
+        return False
+    selection = root.focus_get()
+    if str(selection) != ".!entry3":
+        pauseShortSet.delete(0, END)
+        keys.clear()
+        return False
+
+
+def keyListen(event):
+    pauseShortSet.delete(0, END)
+    keys.clear()
+    listener = keyboard.Listener(
+        on_press=on_press,
+        on_release=on_release)
+    listener.start()
+
+
+pauseShortSet = Entry(root, width=30, bg="#2c2c2c", fg="white", textvariable=on_release)
+pauseShortSet.bind('<KeyPress>', disableBox)
+pauseShortSet.bind('<Button-1>', keyListen)
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
     conline = configfile.readlines()
@@ -406,10 +474,39 @@ except IndexError:
         configfile.writelines("shortcut = Key.alt+c\n")
 
 
+with open(homedir + "/.config/screentorch/config", "r") as configfile:
+    conline = configfile.readlines()
+
+line = 0
+while line < len(conline) and not re.match("^pshortcut\W+=\W+\S*$", conline[line].strip()):
+    line += 1
+
+if not line < len(conline) and len(conline) > 0:
+    if not conline[-1][-1] == "\n":
+        conline[-1] = conline[-1] + "\n"
+else:
+    pass
+
+    if re.match('^pshortcut\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
+        pass
+
+    conline[line] = "pshortcut = " + str(conline[line]) + "\n"
+try:
+    brokentext4 = conline[line].strip(str(re.match('^pshortcut\W+=\W+\S', conline[line])))
+    pauseShortSet.insert(0, brokentext4.strip("\n"))
+    pshortcut = brokentext4
+except IndexError:
+    pauseShortSet.insert(0, "Key.alt+h")
+    pshortcut = "Key.alt+h"
+    with open(homedir + "/.config/screentorch/config", "a") as configfile:
+        configfile.writelines("pshortcut = Key.alt+h\n")
+
+
 keyShortSet.grid(row=8, column=0, columnspan=2, sticky=E)
+pauseShortSet.grid(row=9, column=0, columnspan=2, sticky=E)
 
 fileOutput = Label(root, text="Output:", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
-fileOutput.grid(row=9, column=0, padx=16, sticky=W, pady=7)
+fileOutput.grid(row=10, column=0, padx=16, sticky=W, pady=13)
 
 fileOutputTextbox = Entry(root, width=54, bg="#2c2c2c", fg="white")
 
@@ -442,7 +539,7 @@ except IndexError:
         configfile.writelines("output = " + homedir + "\n")
 
 
-fileOutputTextbox.grid(row=9, column=0, columnspan=2, sticky=E)
+fileOutputTextbox.grid(row=10, column=0, columnspan=2, sticky=E)
 
 
 length = Entry(root, width=22, bg="#2c2c2c", fg="white")
@@ -542,7 +639,7 @@ setBitrate.bind('<KeyPress>', typeCheck)
 
 
 tmpOutput = Label(root, text="Temp directory:", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
-tmpOutput.grid(row=10, column=0, padx=16, sticky=W, pady=13)
+tmpOutput.grid(row=11, column=0, padx=16, sticky=W, pady=7)
 
 
 tmpOutputTextbox = Entry(root, width=48, bg="#2c2c2c", fg="white")
@@ -576,7 +673,7 @@ except IndexError:
         configfile.writelines("temp = " + homedir + "/.cache/screentorch\n")
 
 
-tmpOutputTextbox.grid(row=10, column=0, columnspan=2, sticky=E)
+tmpOutputTextbox.grid(row=11, column=0, columnspan=2, sticky=E)
 
 
 def saveClick(clicksavebutton):
@@ -587,6 +684,7 @@ def saveClick(clicksavebutton):
     tempbox = tmpOutputTextbox.get()
     shortbox = keyShortSet.get()
     screenbox = screenTextbox.get()
+    pBox = pauseShortSet.get()
     def saveLength():
         global cliplength
         with open(homedir + "/.config/screentorch/config", "r") as configfile:
@@ -811,6 +909,38 @@ def saveClick(clicksavebutton):
             saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
+    def savepShortcut():
+        global pshortcut
+        with open(homedir + "/.config/screentorch/config", "r") as configfile:
+            conline = configfile.readlines()
+
+        line = 0
+        while line < len(conline) and not re.match("^pshortcut\W+=\W+\S*$", conline[line].strip()):
+            line += 1
+
+        if not line < len(conline) and len(conline) > 0:
+            if not conline[-1][-1] == "\n":
+                conline[-1] = conline[-1] + "\n"
+            conline.append("pshortcut = " + str(pBox) + "\n")
+        else:
+            pass
+
+            if re.match('^pshortcut\W+=\W+' + str(pBox) + '$', conline[line].strip()):
+                return
+
+            conline[line] = "shortcut = " + str(pBox) + "\n"
+        if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
+            with open(homedir + "/.config/screentorch/config", "w") as configfile:
+                configfile.writelines(conline)
+            pshortcut = pauseShortSet.get()
+            saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
+            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.after(1000, saveLabel.destroy)
+        else:
+            saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
+            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.after(3500, saveLabel.destroy)
+
     saveLength()
     saveBitrate()
     saveFPS()
@@ -818,6 +948,7 @@ def saveClick(clicksavebutton):
     saveTemp()
     saveShortcut()
     saveScreen()
+    savepShortcut()
     tmpsl = tmpOutputTextbox.get()
     if tmpsl == "Tomo chan best girl":
         os.popen("xdg-open " + homedir + "/.config/screentorch/assets/test.jpg")
@@ -1004,7 +1135,7 @@ def destroyUI(destroy):
 
 
 save = Label(root, image=saveButtonImg)
-save.place(relx=0.5, rely=0.79, anchor=CENTER)
+save.place(relx=0.5, rely=0.83, anchor=CENTER)
 save.bind("<Button-1>", saveClick)
 
 quitButton = Label(root, image=quitButtonImg)
@@ -1014,6 +1145,7 @@ quitButton.bind("<Button-1>", destroyUI)
 
 root.mainloop()
 if enabled == 1:
+    deactivated = 0
     os.popen("killall recorder")
     buttons = []
     for num, word in enumerate(shortcut.split("+")):
@@ -1029,6 +1161,21 @@ if enabled == 1:
         else:
             shortcut = shortcut + str(buttons[wordcount]) + "+"
         wordcount += 1
+    buttons2 = []
+    for num, word in enumerate(pshortcut.split("+")):
+        if len(word) > 3 and word.strip("Key."):
+            buttons2.append("<" + word.strip("Key.\n") + ">")
+        else:
+            buttons2.append(word.strip())
+    wordcount2 = 0
+    pshortcut = ""
+    while wordcount2 < len(buttons2):
+        if wordcount2 == len(buttons2)-1:
+            pshortcut = pshortcut + str(buttons2[wordcount2])
+        else:
+            pshortcut = pshortcut + str(buttons2[wordcount2]) + "+"
+        wordcount2 += 1
+    print(pshortcut)
     filename = str(random.randrange(10000000000)) + ".mkv"
     filename2 = str(random.randrange(10000000000)) + ".mkv"
     rescmd = os.popen("xrandr | grep \* | cut -d' ' -f4").read().strip()
@@ -1050,9 +1197,9 @@ if enabled == 1:
 
     def ffmpeg():
         if len(res) > 1 and offset[0] != str(offset):
-            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
+            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
         else:
-            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename).read()
+            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
     '''
     def instance2():
         os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
@@ -1093,7 +1240,7 @@ if enabled == 1:
         os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "ffmpeg"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR-0)}' + "'" + '|bash')
 
 
-    def on_activate():
+    def highlight():
         global filename
         os.popen("killall recorder")
         RecordingThread(target=ffmpeg, name="recording").stop()
@@ -1110,17 +1257,21 @@ if enabled == 1:
         os.popen("notify-send 'Highlight saved!'")
         RecordingThread(target=ffmpeg, name="recording").start()
 
+    def pause():
+        global deactivated
+        deactivated += 1
+        if deactivated == 1:
+            os.popen("killall recorder")
+            RecordingThread(target=ffmpeg, name="recording").stop()
+            os.popen("notify-send 'Recording paused'")
+        if deactivated > 1:
+            deactivated = 0
+            os.popen("notify-send 'Recording unpaused'")
+            RecordingThread(target=ffmpeg, name="recording").start()
 
-    def for_canonical(f):
-        return lambda k: f(l.canonical(k))
-
-
-    hotkey = keyboard.HotKey(
-        keyboard.HotKey.parse(str(shortcut)),
-        on_activate)
-    with keyboard.Listener(
-            on_press=for_canonical(hotkey.press),
-            on_release=for_canonical(hotkey.release)) as l:
+    with keyboard.GlobalHotKeys({
+        str(shortcut): highlight,
+        str(pshortcut): pause}) as l:
         l.join()
     # The following doesn't work at the moment lol, enjoy large files in your temp directory until you don't highlight anything!
     '''
