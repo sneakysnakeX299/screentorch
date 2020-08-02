@@ -18,11 +18,19 @@
 - PulseAudio
 
 # Installation:
-- run "install" with your favourite shell
+- Run "install" with your favourite shell.
+- If something goes wrong, run it with your shell's force flag.
+
+# Removal:
+- Run "uninstall" with your favourite shell.
+- If something goes wrong, run it with your shell's force flag.
+## IMPORTANT!
+- If you're running a version of the program released BEFORE adding "uninstall-old" to the repository, use "uninstall-old" instead, as some files are now part of the "assets" directory and said files were previously in "/usr/bin".
 
 # TODO:
 - Fix dodgy solutions and make code less spaghetti
-- Add shortcut to stop ffmpeg
+- Make program as comfortable to use as possible
+- Add shortcut to stop recording
 - Fix the final bit of the code so space could be saved
 
 # Bug reports:
