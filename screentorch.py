@@ -1235,9 +1235,9 @@ if enabled == 1:
     sleep(1)
     if microphone == 1:
         #outsource = os.popen("pacmd list-sources|awk '/index:/ {print $0}; /name:/ {print $0};/device\.description/ {print $0}'").read()
-        os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "ffmpeg"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR+1)}' + "'" + '|bash')
+        os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "recorder"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR+1)}' + "'" + '|bash')
     else:
-        os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "ffmpeg"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR-0)}' + "'" + '|bash')
+        os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "recorder"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR-0)}' + "'" + '|bash')
 
 
     def highlight():
