@@ -1197,9 +1197,9 @@ if enabled == 1:
 
     def ffmpeg():
         if len(res) > 1 and offset[0] != str(offset):
-            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
+            os.popen(homedir + "/.config/screentorch/assets/recorder -hwaccel auto -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
         else:
-            os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
+            os.popen(homedir + "/.config/screentorch/assets/recorder -hwaccel auto -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
     '''
     def instance2():
         os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
