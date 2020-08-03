@@ -314,7 +314,7 @@ keys = []
 def on_press(key):
     try:
         selection = root.focus_get()
-        if str(selection) != ".!entry":
+        if str(selection) != ".!entry2":
             keyShortSet.delete(0, END)
             keys.clear()
             return False
@@ -335,7 +335,7 @@ def on_press(key):
             keyShortSet.insert(END, str(key).strip("'"))
     except AttributeError:
         selection = root.focus_get()
-        if str(selection) != ".!entry":
+        if str(selection) != ".!entry2":
             keyShortSet.delete(0, END)
             keys.clear()
             return False
@@ -356,7 +356,7 @@ def on_release(key):
         keys.clear()
         return False
     selection = root.focus_get()
-    if str(selection) != ".!entry":
+    if str(selection) != ".!entry2":
         keyShortSet.delete(0, END)
         keys.clear()
         return False
@@ -383,7 +383,7 @@ pauseShort = Label(root, text="Pause shortcut(Esc when done):", font=("Helvetica
 pauseShort.grid(row=9, column=0, padx=16, sticky=W, pady=7)
 
 
-def on_press(key):
+def on_pressp(key):
     try:
         selection = root.focus_get()
         if str(selection) != ".!entry3":
@@ -413,7 +413,7 @@ def on_press(key):
             return False
 
 
-def on_release(key):
+def on_releasep(key):
     if key == key:
         keys.remove(str(key).strip("'"))
         pauseShortSet.delete(0, END)
@@ -434,18 +434,18 @@ def on_release(key):
         return False
 
 
-def keyListen(event):
+def keyListenp(event):
     pauseShortSet.delete(0, END)
     keys.clear()
     listener = keyboard.Listener(
-        on_press=on_press,
-        on_release=on_release)
+        on_press=on_pressp,
+        on_release=on_releasep)
     listener.start()
 
 
-pauseShortSet = Entry(root, width=30, bg="#2c2c2c", fg="white", textvariable=on_release)
+pauseShortSet = Entry(root, width=30, bg="#2c2c2c", fg="white", textvariable=on_releasep)
 pauseShortSet.bind('<KeyPress>', disableBox)
-pauseShortSet.bind('<Button-1>', keyListen)
+pauseShortSet.bind('<Button-1>', keyListenp)
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
     conline = configfile.readlines()
