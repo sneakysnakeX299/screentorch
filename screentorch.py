@@ -54,9 +54,9 @@ onstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/o
 low = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/low.png"))
 medium = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/medium.png"))
 high = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/high.png"))
-quitButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quitstart.png"))
+quitButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quit.png"))
 saveButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/save.png"))
-qns = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quit.png"))
+qns = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quitstart.png"))
 
 enabledButton = Label(root, image=onstate)
 disabledButton = Label(root, image=offstate)
