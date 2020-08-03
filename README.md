@@ -30,7 +30,6 @@
 # TODO:
 - Fix dodgy solutions and make code less spaghetti
 - Make program as comfortable to use as possible
-- Add shortcut to stop recording
 - Fix the final bit of the code so space could be saved
 
 # Bug reports:
