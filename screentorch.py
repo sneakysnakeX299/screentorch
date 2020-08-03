@@ -54,8 +54,9 @@ onstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/o
 low = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/low.png"))
 medium = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/medium.png"))
 high = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/high.png"))
-quitButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quit.png"))
+quitButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quitstart.png"))
 saveButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/save.png"))
+qns = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quit.png"))
 
 enabledButton = Label(root, image=onstate)
 disabledButton = Label(root, image=offstate)
@@ -710,11 +711,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             cliplength = conline[line].strip("length =\n")
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def saveFPS():
@@ -742,11 +743,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             fps = conline[line].strip("fps =\n")
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def saveBitrate():
@@ -774,11 +775,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
             bitrate = conline[line].strip("bitrate =\n")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def saveScreen():
@@ -806,11 +807,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
             screen = conline[line].strip("screen =\n")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def saveLocation():
@@ -838,11 +839,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             output = conline[line].strip("output =\n")
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def saveShortcut():
@@ -870,11 +871,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             shortcut = keyShortSet.get()
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def saveTemp():
@@ -902,11 +903,11 @@ def saveClick(clicksavebutton):
                 configfile.writelines(conline)
             temp = conline[line].strip("temp =\n")
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     def savepShortcut():
@@ -928,17 +929,17 @@ def saveClick(clicksavebutton):
             if re.match('^pshortcut\W+=\W+' + str(pBox) + '$', conline[line].strip()):
                 return
 
-            conline[line] = "shortcut = " + str(pBox) + "\n"
+            conline[line] = "pshortcut = " + str(pBox) + "\n"
         if int(fpsbox) <= 2147483648 and int(lengthbox) <= 3600 and int(bitratebox) <= 2147483648 and int(screenbox) <= 2147483648:
             with open(homedir + "/.config/screentorch/config", "w") as configfile:
                 configfile.writelines(conline)
             pshortcut = pauseShortSet.get()
             saveLabel = Label(root, text="Saved!", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(1000, saveLabel.destroy)
         else:
             saveLabel = Label(root, text="Save failed", bg="#1c1c1c", fg="white")
-            saveLabel.place(relx=0.5, rely=0.85, anchor=CENTER)
+            saveLabel.place(relx=0.5, rely=0.98, anchor=CENTER)
             saveLabel.after(3500, saveLabel.destroy)
 
     saveLength()
@@ -1135,13 +1136,16 @@ def destroyUI(destroy):
 
 
 save = Label(root, image=saveButtonImg)
-save.place(relx=0.5, rely=0.83, anchor=CENTER)
+save.place(relx=0.25, rely=0.83, anchor=CENTER)
 save.bind("<Button-1>", saveClick)
 
 quitButton = Label(root, image=quitButtonImg)
-quitButton.place(relx=0.5, rely=0.92, anchor=CENTER)
+quitButton.place(relx=0.75, rely=0.83, anchor=CENTER)
 quitButton.bind("<Button-1>", destroyUI)
 
+quitNoStart = Label(root, image=qns)
+quitNoStart.place(relx=0.5, rely=0.92, anchor=CENTER)
+quitNoStart.bind("<Button-1>", exit)
 
 root.mainloop()
 if enabled == 1:
