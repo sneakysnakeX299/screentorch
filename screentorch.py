@@ -116,11 +116,37 @@ else:
     conline[line] = str(conline[line]) + "\n"
 try:
     if re.match('^enabled\W+=\W+1', conline[line].strip()):
-        enabledButton.grid(row=0, column=1, sticky=E)
-        enabled = 1
+        with open(homedir + "/.xprofile") as xprofile_check:
+            xpline = xprofile_check.readlines()
+            for line in xpline:
+                if "screentorch &".strip() not in line:
+                    enabledButton.grid_remove()
+                    enabled = 0
+                    disabledButton.grid(row=0, column=1, sticky=E)
+                else:
+                    disabledButton.grid_remove()
+                    enabledButton.grid(row=0, column=1, sticky=E)
+                    enabled = 1
+                    break
+        xprofile_check.close()
+        #enabledButton.grid(row=0, column=1, sticky=E)
+        #enabled = 1
     else:
-        enabled = 0
-        disabledButton.grid(row=0, column=1, sticky=E)
+        with open(homedir + "/.xprofile") as xprofile_check:
+            xpline = xprofile_check.readlines()
+            for line in xpline:
+                if "screentorch &".strip() in line:
+                    disabledButton.grid_remove()
+                    enabled = 1
+                    enabledButton.grid(row=0, column=1, sticky=E)
+                    break
+                else:
+                    enabledButton.grid_remove()
+                    disabledButton.grid(row=0, column=1, sticky=E)
+                    enabled = 0
+        xprofile_check.close()
+        #enabled = 0
+        #disabledButton.grid(row=0, column=1, sticky=E)
 except IndexError:
     disabledButton.grid(row=0, column=1, sticky=E)
     with open(homedir + "/.config/screentorch/config", "a") as configfile:
@@ -398,7 +424,7 @@ def on_pressp(key):
         if key == keyboard.Key.esc:
             boxlength = pauseShortSet.get()
             pauseShortSet.delete(len(boxlength)-1, END)
-            keys.remove(str(keyboard.Key.esc)) # Causes ValueError, but that's good, because I don't have to add code to remove the Escape key from the list. Not a bug, but a feature!
+            keys.remove(str(keyboard.Key.esc))  # Causes ValueError, but that's good, because I don't have to add code to remove the Escape key from the list. Not a bug, but a feature!
             keys.clear()
             root.focus()
         if keys.index(str(key).strip("'")) != len(keys):
@@ -686,6 +712,7 @@ def saveClick(clicksavebutton):
     shortbox = keyShortSet.get()
     screenbox = screenTextbox.get()
     pBox = pauseShortSet.get()
+
     def saveLength():
         global cliplength
         with open(homedir + "/.config/screentorch/config", "r") as configfile:
@@ -963,14 +990,27 @@ def selectall(event):
 
 
 def toggleFeature(button):
+    if not os.path.exists(homedir + "/.xprofile"):
+        xprofile = open(homedir + "/.xprofile", "w+")
+        xprofile.write("\n\n")
+        xprofile.close()
     global enabled
     if button == ToggleFeature.OFF:
         disabledButton.grid(row=0, column=1, sticky=E)
         enabled = 0
+        with open(homedir + "/.xprofile", "r") as xprofile:
+            lines = xprofile.readlines()
+        with open(homedir + "/.xprofile", "w") as xprofile:
+            for line in lines:
+                if line.strip("\n") != "screentorch &":
+                    xprofile.write(line)
     elif button == ToggleFeature.ON:
         enabled = 1
         disabledButton.grid_remove()
         enabledButton.grid(row=0, column=1, sticky=E)
+        xprofile = open(homedir + "/.xprofile", "a")
+        xprofile.write("screentorch &\n")
+        xprofile.close()
 
     with open(homedir + "/.config/screentorch/config", "r") as configfile:
         conline = configfile.readlines()
@@ -1148,6 +1188,7 @@ quitNoStart.place(relx=0.5, rely=0.92, anchor=CENTER)
 quitNoStart.bind("<Button-1>", exit)
 
 root.mainloop()
+
 if enabled == 1:
     deactivated = 0
     os.popen("killall recorder")
@@ -1179,7 +1220,6 @@ if enabled == 1:
         else:
             pshortcut = pshortcut + str(buttons2[wordcount2]) + "+"
         wordcount2 += 1
-    print(pshortcut)
     filename = str(random.randrange(10000000000)) + ".mkv"
     filename2 = str(random.randrange(10000000000)) + ".mkv"
     rescmd = os.popen("xrandr | grep \* | cut -d' ' -f4").read().strip()
