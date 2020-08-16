@@ -1301,6 +1301,10 @@ if enabled == 1:
 
     def highlight():
         global filename
+        global deactivated
+        if deactivated == 1:
+            deactivated = 0
+            os.popen("notify-send 'Recording unpaused, highlighting last " + str(cliplength) + " seconds of paused footage...'")
         os.popen("killall recorder")
         RecordingThread(target=ffmpeg, name="recording").stop()
         sleep(2)
