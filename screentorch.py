@@ -57,6 +57,7 @@ high = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/high
 quitButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quit.png"))
 saveButtonImg = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/save.png"))
 qns = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/quitstart.png"))
+clearcache = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/clearcache.png"))
 
 enabledButton = Label(root, image=onstate)
 disabledButton = Label(root, image=offstate)
@@ -669,7 +670,7 @@ tmpOutput = Label(root, text="Temp directory:", font=("Helvetica", 10), bg="#1c1
 tmpOutput.grid(row=11, column=0, padx=16, sticky=W, pady=7)
 
 
-tmpOutputTextbox = Entry(root, width=48, bg="#2c2c2c", fg="white")
+tmpOutputTextbox = Entry(root, width=35, bg="#2c2c2c", fg="white")
 
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
@@ -700,7 +701,7 @@ except IndexError:
         configfile.writelines("temp = " + homedir + "/.cache/screentorch\n")
 
 
-tmpOutputTextbox.grid(row=11, column=0, columnspan=2, sticky=E)
+tmpOutputTextbox.grid(row=11, column=0, columnspan=2, sticky=E, padx=103)
 
 
 def saveClick(clicksavebutton):
@@ -981,6 +982,20 @@ def saveClick(clicksavebutton):
     if tmpsl == "Tomo chan best girl":
         os.popen("xdg-open " + homedir + "/.config/screentorch/assets/test.jpg")
         os.popen("pacat " + homedir + "/.config/screentorch/assets/test.wav")
+
+
+def clrcache(cachefiles):
+    if len(os.listdir(temp)) == 0:
+        pass
+    else:
+        filelist = [f for f in os.listdir(temp) if f.endswith(".mkv")]
+        for f in filelist:
+            os.remove(os.path.join(temp, f))
+
+
+clearCacheBtn = Label(root, image=clearcache)
+clearCacheBtn.grid(row=11, column=0, columnspan=2, sticky=E)
+clearCacheBtn.bind('<Button-1>', clrcache)
 
 
 def selectall(event):
