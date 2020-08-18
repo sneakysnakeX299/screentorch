@@ -98,60 +98,127 @@ shortcut = ""
 screen = ""
 pshortcut = ""
 
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
 
-line = 0
-while line < len(conline) and not re.match('^enabled\W+=\W+[0-1]$', conline[line].strip()):
-    line += 1
+def statusIf():
+    global enabled
+    with open(homedir + "/.xprofile") as xprofile_check:
+        xpline = xprofile_check.readlines()
+        if len(xpline) == 0:
+            with open(homedir + "/.xprofile", "r+") as xprofile_fix:
+                xprofile_fix.write("\n\n")
+            xprofile_fix.close()
+        for line in xpline:
+            if "screentorch &".strip() not in line:
+                enabledButton.grid_remove()
+                enabled = 0
+                disabledButton.grid(row=0, column=1, sticky=E)
+            else:
+                disabledButton.grid_remove()
+                enabledButton.grid(row=0, column=1, sticky=E)
+                enabled = 1
+                break
+    xprofile_check.close()
 
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
 
-    if re.match('^enabled\W+=\W+' + str(re.match('[0-1]$', conline[line].strip())) + '$', conline[line].strip()):
+def statusElse():
+    global enabled
+    with open(homedir + "/.xprofile") as xprofile_check:
+        xpline = xprofile_check.readlines()
+        for line in xpline:
+            if "screentorch &".strip() in line:
+                disabledButton.grid_remove()
+                enabled = 1
+                enabledButton.grid(row=0, column=1, sticky=E)
+                break
+            else:
+                enabledButton.grid_remove()
+                disabledButton.grid(row=0, column=1, sticky=E)
+                enabled = 0
+    xprofile_check.close()
+
+
+def nvencIf():
+    global nvenc
+    enabledButton2.grid(row=5, column=1, sticky=E)
+    nvenc = "h264_nvenc"
+
+
+def nvencElse():
+    global nvenc
+    disabledButton2.grid(row=5, column=1, sticky=E)
+    nvenc = "libx264"
+
+
+def micIf():
+    global microphone
+    microphone = 1
+    enabledButton3.grid(row=6, column=1, sticky=E)
+
+
+def micElse():
+    global microphone
+    microphone = 0
+    disabledButton3.grid(row=6, column=1, sticky=E)
+
+
+for checkpass in range(3):
+    tocheck = "enabled"
+    togrid = disabledButton
+    toset = enabled
+    rownum = 0
+    if checkpass == 1:
+        tocheck = "nvenc"
+        togrid = disabledButton2
+        toset = nvenc
+        rownum = 5
+    if checkpass == 2:
+        tocheck = "mic"
+        toset = microphone
+        togrid = disabledButton3
+        rownum = 6
+    with open(homedir + "/.config/screentorch/config", "r") as configfile:
+        conline = configfile.readlines()
+
+    line = 0
+    while line < len(conline) and not re.match('^' + tocheck + '\W+=\W+[0-1]$', conline[line].strip()):
+        line += 1
+
+    if not line < len(conline) and len(conline) > 0:
+        if not conline[-1][-1] == "\n":
+            conline[-1] = conline[-1] + "\n"
+    else:
         pass
 
-    conline[line] = str(conline[line]) + "\n"
-try:
-    if re.match('^enabled\W+=\W+1', conline[line].strip()):
-        with open(homedir + "/.xprofile") as xprofile_check:
-            xpline = xprofile_check.readlines()
-            for line in xpline:
-                if "screentorch &".strip() not in line:
-                    enabledButton.grid_remove()
-                    enabled = 0
-                    disabledButton.grid(row=0, column=1, sticky=E)
-                else:
-                    disabledButton.grid_remove()
-                    enabledButton.grid(row=0, column=1, sticky=E)
-                    enabled = 1
-                    break
-        xprofile_check.close()
-        #enabledButton.grid(row=0, column=1, sticky=E)
-        #enabled = 1
-    else:
-        with open(homedir + "/.xprofile") as xprofile_check:
-            xpline = xprofile_check.readlines()
-            for line in xpline:
-                if "screentorch &".strip() in line:
-                    disabledButton.grid_remove()
-                    enabled = 1
-                    enabledButton.grid(row=0, column=1, sticky=E)
-                    break
-                else:
-                    enabledButton.grid_remove()
-                    disabledButton.grid(row=0, column=1, sticky=E)
-                    enabled = 0
-        xprofile_check.close()
-        #enabled = 0
-        #disabledButton.grid(row=0, column=1, sticky=E)
-except IndexError:
-    disabledButton.grid(row=0, column=1, sticky=E)
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("enabled = 0\n")
+        if re.match('^' + tocheck + '\W+=\W+' + str(re.match('[0-1]$', conline[line].strip())) + '$', conline[line].strip()):
+            pass
+
+        conline[line] = str(conline[line]) + "\n"
+    try:
+        if re.match('^' + tocheck + '\W+=\W+1', conline[line].strip()):
+            if checkpass == 0:
+                statusIf()
+            if checkpass == 1:
+                nvencIf()
+            if checkpass == 2:
+                micIf()
+        else:
+            if checkpass == 0:
+                statusElse()
+            if checkpass == 1:
+                nvencElse()
+            if checkpass == 2:
+                micElse()
+    except IndexError:
+        togrid.grid(row=rownum, column=1, sticky=E)
+        toset = 0
+        if checkpass == 0:
+            enabled = toset
+        if checkpass == 1:
+            nvenc = "libx264"
+        if checkpass == 2:
+            microphone = toset
+        with open(homedir + "/.config/screentorch/config", "a") as configfile:
+            configfile.writelines(tocheck + " = 0\n")
 
 
 setLength = Label(root, text="Length(in seconds, max value is 3600):", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
@@ -173,35 +240,6 @@ bitrate.grid(row=4, column=0, padx=16, pady=15, sticky=W)
 
 toggleNVENC = Label(root, text="Use NVENC hardware encoding? (Recommended, NVIDIA only)", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
 toggleNVENC.grid(row=5, column=0, padx=16, sticky=W)
-
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
-
-line = 0
-while line < len(conline) and not re.match('^nvenc\W+=\W+[0-1]$', conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^nvenc\W+=\W+' + str(re.match('[0-1]$', conline[line].strip())) + '$', conline[line].strip()):
-        pass
-
-    conline[line] = str(conline[line]) + "\n"
-try:
-    if re.match('^nvenc\W+=\W+1', conline[line].strip()):
-        enabledButton2.grid(row=5, column=1, sticky=E)
-        nvenc = "h264_nvenc"
-    else:
-        disabledButton2.grid(row=5, column=1, sticky=E)
-        nvenc = "libx264"
-except IndexError:
-    disabledButton2.grid(row=5, column=1, sticky=E)
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("nvenc = 0\n")
 
 
 with open(homedir + "/.config/screentorch/config", "r") as configfile:
@@ -261,35 +299,6 @@ except IndexError:
 toggleMic = Label(root, text="Use microphone:", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
 toggleMic.grid(row=6, column=0, padx=16, pady=13, sticky=W)
 
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
-
-line = 0
-while line < len(conline) and not re.match('^mic\W+=\W+[0-1]$', conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^mic\W+=\W+' + str(re.match('[0-1]$', conline[line].strip())) + '$', conline[line].strip()):
-        pass
-
-    conline[line] = str(conline[line]) + "\n"
-try:
-    if re.match('^mic\W+=\W+1', conline[line].strip()):
-        microphone = 1
-        enabledButton3.grid(row=6, column=1, sticky=E)
-    else:
-        microphone = 0
-        disabledButton3.grid(row=6, column=1, sticky=E)
-except IndexError:
-    disabledButton3.grid(row=6, column=1, sticky=E)
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("mic = 0\n")
-
 
 def typeCheck(event):
     if event.char in '[0123456789]':
@@ -302,32 +311,64 @@ screenLabel = Label(root, text="Screen(in numbers, starting from 0):", font=("He
 screenLabel.grid(row=7, column=0, padx=16, sticky=W, pady=7)
 
 screenTextbox = Entry(root, width=30, bg="#2c2c2c", fg="white")
+setFramerate = Entry(root, width=22, bg="#2c2c2c", fg="white")
+setBitrate = Entry(root, width=22, bg="#2c2c2c", fg="white")
 
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
+checkpass = 0
 
-line = 0
-while line < len(conline) and not re.match('^screen\W+=\W+[0-9][0-9]{0,9}|2147483648$', conline[line].strip()):
-    line += 1
+for checkpass in range(3):
+    if checkpass == 0:
+        tocheck = "screen"
+        toinsert = screenTextbox
+        toset = screen
+        defaultval = "0"
+    if checkpass == 1:
+        tocheck = "fps"
+        toinsert = setFramerate
+        toset = fps
+        defaultval = "60"
+    if checkpass == 2:
+        tocheck = "bitrate"
+        toinsert = setBitrate
+        toset = bitrate
+        defaultval = "15000"
+    with open(homedir + "/.config/screentorch/config", "r") as configfile:
+        conline = configfile.readlines()
 
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
+    line = 0
+    while line < len(conline) and not re.match('^' + tocheck + '\W+=\W+[0-9][0-9]{0,9}|2147483648$', conline[line].strip()):
+        line += 1
 
-    if re.match('^screen\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
+    if not line < len(conline) and len(conline) > 0:
+        if not conline[-1][-1] == "\n":
+            conline[-1] = conline[-1] + "\n"
+    else:
         pass
 
-    conline[line] = "screen = " + str(conline[line]) + "\n"
-try:
-    screenTextbox.insert(0, conline[line].strip("screen =\n"))
-    screen = conline[line].strip("screen =\n")
-except IndexError:
-    screenTextbox.insert(0, "0")
-    screen = "0"
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("screen = 0\n")
+        if re.match('^' + tocheck + '\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
+            pass
+
+        conline[line] = tocheck + " = " + str(conline[line]) + "\n"
+    try:
+        toinsert.insert(0, conline[line].strip(tocheck + " =\n"))
+        toset = conline[line].strip(tocheck + " =\n")
+        if checkpass == 0:
+            screen = toset
+        if checkpass == 1:
+            fps = toset
+        if checkpass == 2:
+            bitrate = toset
+    except IndexError:
+        toinsert.insert(0, defaultval)
+        toset = defaultval
+        if checkpass == 0:
+            screen = toset
+        if checkpass == 1:
+            fps = toset
+        if checkpass == 2:
+            bitrate = toset
+        with open(homedir + "/.config/screentorch/config", "a") as configfile:
+            configfile.writelines(tocheck + " = " + toset + "\n")
 
 screenTextbox.grid(row=7, column=0, columnspan=2, sticky=E)
 screenTextbox.bind("<KeyPress>", typeCheck)
@@ -602,65 +643,9 @@ length.grid(row=1, column=0, columnspan=2, sticky=E)
 length.bind('<KeyPress>', typeCheck)
 
 
-setFramerate = Entry(root, width=22, bg="#2c2c2c", fg="white")
-
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
-
-line = 0
-while line < len(conline) and not re.match('^fps\W+=\W+[0-9][0-9]{0,9}|2147483648$', conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^fps\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
-        pass
-
-    conline[line] = "fps = " + str(conline[line]) + "\n"
-try:
-    setFramerate.insert(0, conline[line].strip("fps =\n"))
-    fps = conline[line].strip("fps =\n")
-except IndexError:
-    setFramerate.insert(0, "60")
-    fps = "60"
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("fps = 60\n")
-
 setFramerate.grid(row=3, column=0, columnspan=2, sticky=E)
 setFramerate.bind('<KeyPress>', typeCheck)
 
-
-setBitrate = Entry(root, width=22, bg="#2c2c2c", fg="white")
-
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
-
-line = 0
-while line < len(conline) and not re.match('^bitrate\W+=\W+[0-9][0-9]{0,9}|2147483648$', conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^bitrate\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
-        pass
-
-    conline[line] = "bitrate = " + str(conline[line]) + "\n"
-try:
-    setBitrate.insert(0, conline[line].strip("bitrate =\n"))
-    bitrate = conline[line].strip("bitrate =\n")
-except IndexError:
-    setBitrate.insert(0, "15000")
-    bitrate = "15000"
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("bitrate = 15000\n")
 
 setBitrate.grid(row=4, column=0, columnspan=2, sticky=E)
 setBitrate.bind('<KeyPress>', typeCheck)
@@ -1205,6 +1190,18 @@ quitNoStart.bind("<Button-1>", exit)
 root.mainloop()
 
 if enabled == 1:
+    print(enabled)
+    print(nvenc)
+    print(quality)
+    print(microphone)
+    print(bitrate)
+    print(output)
+    print(temp)
+    print(fps)
+    print(cliplength)
+    print(shortcut)
+    print(screen)
+    print(pshortcut)
     deactivated = 0
     os.popen("killall recorder")
     buttons = []
@@ -1259,10 +1256,7 @@ if enabled == 1:
             os.popen(homedir + "/.config/screentorch/assets/recorder -hwaccel auto -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0+" + offset[0] + ",0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
         else:
             os.popen(homedir + "/.config/screentorch/assets/recorder -hwaccel auto -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K -y " + str(temp) + "/" + filename).read()
-    '''
-    def instance2():
-        os.popen(homedir + "/.config/screentorch/assets/recorder -f pulse -i default -f x11grab -s " + str(res[int(screen)]) + " -framerate " + str(fps) + " -i :0.0 -pix_fmt yuv420p -c:v " + str(nvenc) + " -preset " + str(quality) + " -b:v " + str(bitrate) + "K -maxrate " + str(bitrate) + "K " + str(temp) + "/" + filename2).read()
-    '''
+
     class RecordingThread(threading.Thread):
         daemon = True
 
@@ -1275,25 +1269,11 @@ if enabled == 1:
 
         def stopped(self):
             return self._stop_event.is_set()
-    '''
-    class RecordingThread2(threading.Thread):
-        daemon = True
 
-        def __init__(self, *args, **kwargs):
-            super(RecordingThread2, self).__init__(*args, **kwargs)
-            self._stop_event = threading.Event()
-
-        def stop(self):
-            self._stop_event.set()
-
-        def stopped(self):
-            return self._stop_event.is_set()
-    '''
 
     RecordingThread(target=ffmpeg, name="recording").start()
     sleep(1)
     if microphone == 1:
-        #outsource = os.popen("pacmd list-sources|awk '/index:/ {print $0}; /name:/ {print $0};/device\.description/ {print $0}'").read()
         os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "recorder"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR+1)}' + "'" + '|bash')
     else:
         os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "recorder"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR-0)}' + "'" + '|bash')
@@ -1336,33 +1316,5 @@ if enabled == 1:
         str(shortcut): highlight,
         str(pshortcut): pause}) as l:
         l.join()
-    # The following doesn't work at the moment lol, enjoy large files in your temp directory until you don't highlight anything!
-    '''
-    while True:
-        currtime = datetime.now()
-        sleep(1)
-        counter += 1
-        print(str(counter))
-        if counter == 90:
-            os.popen("killall ffmpeg")
-            RecordingThread(target=ffmpeg, name="recording").stop()
-            RecordingThread2(target=ffmpeg, name="recording").start()
-            if counter == 90 + int(cliplength):
-                counter = 0
-                os.popen("rm " + filename)
-                filename = filename2
-                filename2 = str(random.randrange(10000000000)) + ".mkv"
-            elif 90 < counter < 90 + int(cliplength):
-                os.popen("killall ffmpeg")
-                RecordingThread2(target=ffmpeg, name="recording").stop()
-                sleep(2)
-                os.popen("ffmpeg -i 'concat:" + filename + "|" + filename2 + "' -codec copy " + "'" + str(temp) + "/" + "temp.mkv'")
-                filelength = os.popen("ffprobe -i " + "'" + str(temp) + "/temp.mkv'" + " -show_entries format=duration -v quiet -of csv='p=0'").read().strip()
-                duration = float(filelength) - float(cliplength)
-                sleep(2)
-                os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(currtime) + ".mkv" + "'")
-                filename = str(random.randrange(10000000000)) + ".mkv"
-                filename2 = str(random.randrange(10000000000)) + ".mkv"
-    '''
 else:
     exit()
