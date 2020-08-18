@@ -20,6 +20,11 @@
 # Installation:
 - Run "install" with your favourite shell.
 - If something goes wrong, run it with your shell's force flag.
+## Arch
+- You can install it from the AUR through on AUR helper. For example, with yay:
+```
+yay -S screentorch
+```
 
 # Removal:
 - Run "uninstall" with your favourite shell.
