@@ -515,60 +515,47 @@ pauseShortSet = Entry(root, width=30, bg="#2c2c2c", fg="white", textvariable=on_
 pauseShortSet.bind('<KeyPress>', disableBox)
 pauseShortSet.bind('<Button-1>', keyListenp)
 
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
+for checkpass in range(2):
+    tocheck = "shortcut"
+    toinsert = keyShortSet
+    defaultval = "Key.alt+c"
+    if checkpass == 1:
+        tocheck = "pshortcut"
+        toinsert = pauseShortSet
+        toset = pshortcut
+        defaultval = "Key.alt+h"
+    with open(homedir + "/.config/screentorch/config", "r") as configfile:
+        conline = configfile.readlines()
 
-line = 0
-while line < len(conline) and not re.match("^shortcut\W+=\W+\S*$", conline[line].strip()):
-    line += 1
+    line = 0
+    while line < len(conline) and not re.match("^" + tocheck + "\W+=\W+\S*$", conline[line].strip()):
+        line += 1
 
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^shortcut\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
+    if not line < len(conline) and len(conline) > 0:
+        if not conline[-1][-1] == "\n":
+            conline[-1] = conline[-1] + "\n"
+    else:
         pass
 
-    conline[line] = "shortcut = " + str(conline[line]) + "\n"
-try:
-    brokentext3 = conline[line].strip(str(re.match('^shortcut\W+=\W+\S', conline[line])))
-    keyShortSet.insert(0, brokentext3.strip("\n"))
-    shortcut = brokentext3
-except IndexError:
-    keyShortSet.insert(0, "Key.alt+c")
-    shortcut = "Key.alt+c"
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("shortcut = Key.alt+c\n")
+        if re.match('^' + tocheck + '\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
+            pass
 
-
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
-
-line = 0
-while line < len(conline) and not re.match("^pshortcut\W+=\W+\S*$", conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^pshortcut\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
-        pass
-
-    conline[line] = "pshortcut = " + str(conline[line]) + "\n"
-try:
-    brokentext4 = conline[line].strip(str(re.match('^pshortcut\W+=\W+\S', conline[line])))
-    pauseShortSet.insert(0, brokentext4.strip("\n"))
-    pshortcut = brokentext4
-except IndexError:
-    pauseShortSet.insert(0, "Key.alt+h")
-    pshortcut = "Key.alt+h"
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("pshortcut = Key.alt+h\n")
+        conline[line] = tocheck + " = " + str(conline[line]) + "\n"
+    try:
+        brokentext = conline[line].strip(str(re.match('^' + tocheck + '\W+=\W+\S', conline[line])))
+        toinsert.insert(0, brokentext.strip("\n"))
+        if checkpass == 0:
+            shortcut = brokentext
+        if checkpass == 1:
+            pshortcut = brokentext
+    except IndexError:
+        toinsert.insert(0, defaultval)
+        if checkpass == 0:
+            shortcut = defaultval
+        if checkpass == 1:
+            pshortcut = defaultval
+        with open(homedir + "/.config/screentorch/config", "a") as configfile:
+            configfile.writelines(tocheck + " = " + defaultval + "\n")
 
 
 keyShortSet.grid(row=8, column=0, columnspan=2, sticky=E)
@@ -578,34 +565,48 @@ fileOutput = Label(root, text="Output:", font=("Helvetica", 10), bg="#1c1c1c", f
 fileOutput.grid(row=10, column=0, padx=16, sticky=W, pady=13)
 
 fileOutputTextbox = Entry(root, width=54, bg="#2c2c2c", fg="white")
+tmpOutputTextbox = Entry(root, width=35, bg="#2c2c2c", fg="white")
 
+for checkpass in range(2):
+    tocheck = "output"
+    toinsert = fileOutputTextbox
+    defaultval = homedir
+    if checkpass == 1:
+        tocheck = "temp"
+        toinsert = tmpOutputTextbox
+        defaultval = homedir + "/.cache/screentorch"
+    with open(homedir + "/.config/screentorch/config", "r") as configfile:
+        conline = configfile.readlines()
 
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
+    line = 0
+    while line < len(conline) and not re.match("^" + tocheck + "\W+=\W+\S*$", conline[line].strip()):
+        line += 1
 
-line = 0
-while line < len(conline) and not re.match("^output\W+=\W+\S*$", conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match("^output\W+=\W+" + str(conline[line]) + '$', conline[line].strip()):
+    if not line < len(conline) and len(conline) > 0:
+        if not conline[-1][-1] == "\n":
+            conline[-1] = conline[-1] + "\n"
+    else:
         pass
 
-    conline[line] = "output = " + str(conline[line]) + "\n"
-try:
-    brokentext2 = conline[line].strip(str(re.match('^output\W+=\W+', conline[line])))
-    fileOutputTextbox.insert(0, brokentext2.strip("\n"))
-    output = brokentext2.strip()
-except IndexError:
-    fileOutputTextbox.insert(0, homedir)
-    output = homedir
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("output = " + homedir + "\n")
+        if re.match("^" + tocheck + "\W+=\W+" + str(conline[line]) + '$', conline[line].strip()):
+            pass
+
+        conline[line] = tocheck + " = " + str(conline[line]) + "\n"
+    try:
+        brokentext = conline[line].strip(str(re.match('^' + tocheck + '\W+=\W+', conline[line])))
+        toinsert.insert(0, brokentext.strip("\n"))
+        if checkpass == 0:
+            output = brokentext.strip()
+        if checkpass == 1:
+            temp = brokentext.strip()
+    except IndexError:
+        toinsert.insert(0, defaultval)
+        if checkpass == 0:
+            output = defaultval
+        if checkpass == 1:
+            temp = defaultval
+        with open(homedir + "/.config/screentorch/config", "a") as configfile:
+            configfile.writelines("output = " + homedir + "\n")
 
 
 fileOutputTextbox.grid(row=10, column=0, columnspan=2, sticky=E)
@@ -653,37 +654,6 @@ setBitrate.bind('<KeyPress>', typeCheck)
 
 tmpOutput = Label(root, text="Temp directory:", font=("Helvetica", 10), bg="#1c1c1c", fg="white")
 tmpOutput.grid(row=11, column=0, padx=16, sticky=W, pady=7)
-
-
-tmpOutputTextbox = Entry(root, width=35, bg="#2c2c2c", fg="white")
-
-
-with open(homedir + "/.config/screentorch/config", "r") as configfile:
-    conline = configfile.readlines()
-
-line = 0
-while line < len(conline) and not re.match("^temp\W+=\W+\S*$", conline[line].strip()):
-    line += 1
-
-if not line < len(conline) and len(conline) > 0:
-    if not conline[-1][-1] == "\n":
-        conline[-1] = conline[-1] + "\n"
-else:
-    pass
-
-    if re.match('^temp\W+=\W+' + str(conline[line]) + '$', conline[line].strip()):
-        pass
-
-    conline[line] = "temp = " + str(conline[line]) + "\n"
-try:
-    brokentext = conline[line].strip(str(re.match('^temp\W+=\W+\S', conline[line])))
-    temp = brokentext.strip()
-    tmpOutputTextbox.insert(0, brokentext.strip("\n"))
-except IndexError:
-    temp = homedir + "/.cache/screentorch"
-    tmpOutputTextbox.insert(0, homedir + "/.cache/screentorch")
-    with open(homedir + "/.config/screentorch/config", "a") as configfile:
-        configfile.writelines("temp = " + homedir + "/.cache/screentorch\n")
 
 
 tmpOutputTextbox.grid(row=11, column=0, columnspan=2, sticky=E, padx=103)
@@ -1190,18 +1160,6 @@ quitNoStart.bind("<Button-1>", exit)
 root.mainloop()
 
 if enabled == 1:
-    print(enabled)
-    print(nvenc)
-    print(quality)
-    print(microphone)
-    print(bitrate)
-    print(output)
-    print(temp)
-    print(fps)
-    print(cliplength)
-    print(shortcut)
-    print(screen)
-    print(pshortcut)
     deactivated = 0
     os.popen("killall recorder")
     buttons = []
