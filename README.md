@@ -36,9 +36,9 @@ yay -S screentorch
 - Redownload everything and run "install" with your shell's force flag(only tested with bash).
 
 # TODO:
-- Fix dodgy solutions and make code less spaghetti
+- Fix dodgy solutions and make code less spaghetti - Almost there...
 - Make program as comfortable to use as possible
-- Fix the final bit of the code so space could be saved
+- Add function to automatically delete current recording after some time to save disk space - "Clear Folder" button is a workaround for now
 
 # Bug reports:
 Please, report bugs, so I can fix them. Feel free to pull and rework it, I'd like to learn from better coders than me. Thank you.
