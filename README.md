@@ -25,6 +25,7 @@
 ```
 yay -S screentorch
 ```
+Well, not anymore, because aur is gei
 
 # Removal:
 - Run "uninstall" with your favourite shell.
