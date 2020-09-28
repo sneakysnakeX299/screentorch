@@ -1247,15 +1247,24 @@ if enabled == 1:
         RecordingThread(target=ffmpeg, name="recording").stop()
         sleep(2)
         filelength = os.popen("ffprobe -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -show_entries format=duration -v quiet -of csv='p=0'").read().strip()
-        currtime = datetime.now()
+        currtime = str(datetime.now())
+        tod = currtime.split(":")
+        fname = "screentorch_"
+        currtime = 0
+        while currtime != len(tod):
+            if currtime == len(tod) - 1:
+                fname = fname + tod[currtime]
+            else:
+                fname = fname + tod[currtime] + "-"
+            currtime += 1
         if float(filelength) < float(cliplength):
-            os.popen("mv " + "'" + str(temp) + "/" + str(filename) + "' '" + str(output) + "/" + str(currtime) + ".mkv" + "'")
+            os.popen("mv " + "'" + str(temp) + "/" + str(filename) + "' '" + str(output) + "/" + str(fname) + ".mkv" + "'")
         else:
             duration = float(filelength) - float(cliplength)
-            os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(currtime) + ".mkv" + "'")
+            os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(fname) + ".mkv" + "'")
         sleep(2)
         os.popen("rm " + "'" + str(temp) + "/" + str(filename) + "'")
-        os.popen("notify-send 'Highlight saved!'")
+        os.popen("notify-send 'Highlight saved to " + str(output) + "/" + str(fname) + ".mkv" + "'")
         RecordingThread(target=ffmpeg, name="recording").start()
 
     def pause():
