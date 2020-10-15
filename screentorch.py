@@ -1418,6 +1418,7 @@ if enabled == 1 and fqcheck == 1:
         confirmation = messagebox.askyesno(title="Kill combination pressed", message="Are you sure you want to kill screentorch?")
         if confirmation:
             RecordingThread(target=ffmpeg, name="recording").stop()
+            os.popen("killall recorder")
             exit()
         else:
             askme.destroy()
