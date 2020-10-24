@@ -49,7 +49,7 @@ root.title("screentorch")
 root.resizable(False, False)
 root.geometry("520x670")
 root.configure(background="#1c1c1c")
-root.iconbitmap(homedir + "/.config/screentorch/assets/logo.ico")
+root.iconphoto(False, PhotoImage(file=homedir + "/.config/screentorch/assets/logo.png"))
 
 offstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/offstate.png"))
 onstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/onstate.png"))
