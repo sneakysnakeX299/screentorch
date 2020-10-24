@@ -49,6 +49,7 @@ root.title("screentorch")
 root.resizable(False, False)
 root.geometry("520x670")
 root.configure(background="#1c1c1c")
+root.iconbitmap(homedir + "/.config/screentorch/assets/logo.ico")
 
 offstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/offstate.png"))
 onstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/onstate.png"))
@@ -1418,6 +1419,7 @@ if enabled == 1 and fqcheck == 1:
         confirmation = messagebox.askyesno(title="Kill combination pressed", message="Are you sure you want to kill screentorch?")
         if confirmation:
             RecordingThread(target=ffmpeg, name="recording").stop()
+            os.popen("killall recorder")
             exit()
         else:
             askme.destroy()
