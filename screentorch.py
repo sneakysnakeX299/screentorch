@@ -1125,12 +1125,25 @@ def toggleFeature(button):
 
 def toggleNVENC(button):
     global nvenc
+    global quality
     if button == ToggleNVENC.OFF:
         disabledButton2.grid(row=5, column=1, sticky=E)
         nvenc = "libx264"
+        if quality == "llhp":
+            quality = "ultrafast"
+        elif quality == "ll":
+            quality = "faster"
+        elif quality == "llhq":
+            quality = "slow"
     elif button == ToggleNVENC.ON:
         disabledButton2.grid_remove()
         nvenc = "h264_nvenc"
+        if quality == "ultrafast":
+            quality = "llhp"
+        elif quality == "faster":
+            quality = "ll"
+        elif quality == "slow":
+            quality = "llhq"
         enabledButton2.grid(row=5, column=1, sticky=E)
     with open(homedir + "/.config/screentorch/config", "r") as configfile:
         conline = configfile.readlines()
