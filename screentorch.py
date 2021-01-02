@@ -1481,10 +1481,7 @@ if enabled == 1 and fqcheck == 1:
             os.popen("mv " + "'" + str(temp) + "/" + str(filename) + "' '" + str(output) + "/" + str(fname) + ".mkv" + "'")
         else:
             duration = float(filelength) - float(cliplength)
-            if counter < 7200:
-                os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(fname) + ".mkv" + "'")
-            else:
-                os.popen("mv " + "'" + str(temp) + "/" + str(filename) + "' '" + str(output) + "/" + str(fname) + ".mkv" + "'")
+            os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(fname) + ".mkv" + "'")
         sleep(2)
         os.popen("rm " + "'" + str(temp) + "/" + str(filename) + "'")
         os.popen("notify-send 'Highlight saved to " + str(output) + "/" + str(fname) + ".mkv" + "'")
