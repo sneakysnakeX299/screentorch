@@ -49,6 +49,7 @@ root.title("screentorch")
 root.resizable(False, False)
 root.geometry("520x670")
 root.configure(background="#1c1c1c")
+root.iconphoto(False, PhotoImage(file=homedir + "/.config/screentorch/assets/logo.png"))
 
 offstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/offstate.png"))
 onstate = ImageTk.PhotoImage(Image.open(homedir + "/.config/screentorch/assets/onstate.png"))
@@ -1124,12 +1125,25 @@ def toggleFeature(button):
 
 def toggleNVENC(button):
     global nvenc
+    global quality
     if button == ToggleNVENC.OFF:
         disabledButton2.grid(row=5, column=1, sticky=E)
         nvenc = "libx264"
+        if quality == "llhp":
+            quality = "ultrafast"
+        elif quality == "ll":
+            quality = "faster"
+        elif quality == "llhq":
+            quality = "slow"
     elif button == ToggleNVENC.ON:
         disabledButton2.grid_remove()
         nvenc = "h264_nvenc"
+        if quality == "ultrafast":
+            quality = "llhp"
+        elif quality == "faster":
+            quality = "ll"
+        elif quality == "slow":
+            quality = "llhq"
         enabledButton2.grid(row=5, column=1, sticky=E)
     with open(homedir + "/.config/screentorch/config", "r") as configfile:
         conline = configfile.readlines()
@@ -1280,6 +1294,8 @@ root.mainloop()
 
 if enabled == 1 and fqcheck == 1:
     deactivated = 0
+    counter = 0
+    waiting = False
     os.popen("killall recorder")
     buttons = []
     for num, word in enumerate(shortcut.split("+")):
@@ -1369,13 +1385,84 @@ if enabled == 1 and fqcheck == 1:
     else:
         os.popen('pacmd list-source-outputs|tr "\n" " "| awk ' + "'" + 'BEGIN {RS="index:"};/application.process.binary = "recorder"/ {print $0 }' + "'" + ' |awk ' + "'" + '{print"pacmd move-source-output " $1 " " (NR-0)}' + "'" + '|bash')
 
+    class TimeThread(threading.Thread):
+        daemon = True
+
+        def __init__(self, *args, **kwargs):
+            super(TimeThread, self).__init__(*args, **kwargs)
+            self._stop_event = threading.Event()
+
+        def stop(self):
+            return self._stop_event.set()
+
+        def stopped(self):
+            return self._stop_event.is_set()
+
+    def timer():
+        global filename
+        global filename2
+        global waiting
+        global counter
+        global deactivated
+        while counter != 7200 + int(cliplength) + 1:
+            sleep(1)
+            counter += 1
+            if counter == 7200:
+                os.popen("killall recorder")
+                RecordingThread(target=ffmpeg, name="recording").stop()
+                filename2 = filename
+                filename = str(random.randrange(10000000000)) + ".mkv"
+                sleep(0.5)
+                RecordingThread(target=ffmpeg, name="recording").start()
+                waiting = True
+            if counter > 7200 and not waiting:
+                break
+            if counter == 7200 + int(cliplength) and waiting:
+                os.popen("rm " + "'" + str(temp) + "/" + str(filename2) + "'")
+                print("'" + str(temp) + "/" + str(filename2) + "'")
+                counter = 0
+                waiting = False
+
+    TimeThread(target=timer, name="timer").start()
+
 
     def highlight():
         global filename
+        global filename2
         global deactivated
+        global waiting
+        global counter
         if deactivated == 1:
             deactivated = 0
             os.popen("notify-send 'Recording unpaused, highlighting last " + str(cliplength) + " seconds of paused footage...'")
+        waiting = False
+        if counter > 7200 and not waiting:
+            os.popen("killall recorder")
+            RecordingThread(target=ffmpeg, name="recording").stop()
+            TimeThread(target=timer, name="timer").stop()
+            sleep(2)
+            filelength = os.popen("ffprobe -i " + "'" + str(temp) + "/" + str(filename2) + "'" + " -show_entries format=duration -v quiet -of csv='p=0'").read().strip()
+            print(filelength)
+            duration = float(filelength) - float(cliplength)
+            print(duration)
+            filename3 = str(random.randrange(10000000000))
+            print(filename)
+            print(filename2)
+            print(filename3)
+            queue = open(str(temp) + "/lof.txt", "w+")
+            queue.write("file " + str(temp) + "/" + filename2 + "\nfile " + str(temp) + "/" + filename3 + ".mkv\n")
+            queue.close()
+            t = "ffmpeg -ss " + str(counter- duration + 4) + " -i " + "'" + str(temp) + "/" + str(filename2) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(temp) + "/" + str(filename3) + ".mkv" + "'"
+            os.popen("ffmpeg -ss " + str(counter - duration + 4) + " -i " + "'" + str(temp) + "/" + str(filename2) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(temp) + "/" + str(filename3) + ".mkv" + "'")
+            print(t)
+            sleep(2)
+            os.popen("ffmpeg -y -f concat -safe 0 -i '" + str(temp) + "/lof.txt" + "' -c copy '" + str(temp) + "/" + filename + "'").read().strip()
+            tr = "ffmpeg -y -f concat -safe 0 -i '" + str(temp) + "/lof.txt" + "' -c copy '" + str(temp) + "/" + filename + "'"
+            print(tr)
+            sleep(5)
+            os.popen("rm " + "'" + str(temp) + "/" + str(filename2) + "'")
+            os.popen("rm " + "'" + str(temp) + "/" + str(filename3) + ".mkv'")
+            os.popen("rm " + "'" + str(temp) + "/lof.txt'")
         os.popen("killall recorder")
         RecordingThread(target=ffmpeg, name="recording").stop()
         sleep(2)
@@ -1394,11 +1481,16 @@ if enabled == 1 and fqcheck == 1:
             os.popen("mv " + "'" + str(temp) + "/" + str(filename) + "' '" + str(output) + "/" + str(fname) + ".mkv" + "'")
         else:
             duration = float(filelength) - float(cliplength)
-            os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(fname) + ".mkv" + "'")
+            if counter < 15:
+                os.popen("ffmpeg -ss " + str(duration) + " -i " + "'" + str(temp) + "/" + str(filename) + "'" + " -t " + str(filelength) + " -c copy " + "'" + str(output) + "/" + str(fname) + ".mkv" + "'")
+            else:
+                os.popen("mv " + "'" + str(temp) + "/" + str(filename) + "' '" + str(output) + "/" + str(fname) + ".mkv" + "'")
         sleep(2)
         os.popen("rm " + "'" + str(temp) + "/" + str(filename) + "'")
         os.popen("notify-send 'Highlight saved to " + str(output) + "/" + str(fname) + ".mkv" + "'")
+        counter = 0
         RecordingThread(target=ffmpeg, name="recording").start()
+        TimeThread(target=timer, name="timer").start()
 
     def pause():
         global deactivated
@@ -1429,5 +1521,6 @@ if enabled == 1 and fqcheck == 1:
         str(pshortcut): pause,
         str(kshortcut): kill}) as l:
         l.join()
+
 else:
     exit()
