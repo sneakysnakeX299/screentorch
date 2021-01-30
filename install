@@ -1,5 +1,0 @@
-mkdir ~/.config/screentorch
-cp -rf assets/ ~/.config/screentorch/
-cp -f /usr/bin/ffmpeg ~/.config/screentorch/assets/recorder
-cp -f screentorch.py ~/.config/screentorch/assets/
-sudo cp -f screentorch /usr/bin
