@@ -10,6 +10,7 @@
 
 # Dependencies:
 ## PIP:
+- Tk(because for some reason sometimes it's not installed by default)
 - Pillow
 - pynput
 ## Programs:
